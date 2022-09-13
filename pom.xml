@@ -80,6 +80,7 @@
         <module>blade-core-transaction</module>
         <module>blade-core-report</module>
         <module>blade-core-datascope</module>
+        <module>blade-api-crypto</module>
     </modules>
 
     <dependencyManagement>

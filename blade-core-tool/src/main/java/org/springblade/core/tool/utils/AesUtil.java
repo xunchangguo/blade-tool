@@ -49,8 +49,16 @@ public class AesUtil {
 		return encrypt(content.getBytes(charset), aesTextKey.getBytes(Charsets.UTF_8));
 	}
 
+	public static String encryptToBase64(byte[] content, String aesTextKey) {
+		return Base64Util.encodeToString(encrypt(content, aesTextKey));
+	}
+
 	public static byte[] decrypt(byte[] content, String aesTextKey) {
 		return decrypt(content, aesTextKey.getBytes(Charsets.UTF_8));
+	}
+
+	public static byte[] decryptFormBase64(byte[] content, String aesTextKey) {
+		return decrypt(Base64Util.decode(content), aesTextKey);
 	}
 
 	public static String decryptToStr(byte[] content, String aesTextKey) {
@@ -114,7 +122,7 @@ public class AesUtil {
 		}
 
 		static byte[] decode(byte[] decrypted) {
-			int pad = (int) decrypted[decrypted.length - 1];
+			int pad = decrypted[decrypted.length - 1];
 			if (pad < 1 || pad > BLOCK_SIZE) {
 				pad = 0;
 			}
