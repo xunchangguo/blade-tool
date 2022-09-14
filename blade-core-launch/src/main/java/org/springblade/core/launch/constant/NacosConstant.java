@@ -30,7 +30,7 @@ public interface NacosConstant {
 	/**
 	 * nacos 配置前缀
 	 */
-	String NACOS_CONFIG_PREFIX = "blade";
+	String NACOS_CONFIG_PREFIX = "cf";
 
 	/**
 	 * nacos 组配置后缀
