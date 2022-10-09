@@ -58,6 +58,25 @@ public interface NacosConstant {
 	String NACOS_CONFIG_GROUP = "DEFAULT_GROUP";
 
 	/**
+	 * 服务默认加载的配置
+	 *
+	 * @return sharedDataIds
+	 */
+	static String sharedDataId() {
+		return NACOS_CONFIG_PREFIX + "." + NACOS_CONFIG_FORMAT;
+	}
+
+	/**
+	 * 服务默认加载的配置
+	 *
+	 * @param profile 环境变量
+	 * @return sharedDataIds
+	 */
+	static String sharedDataId(String profile) {
+		return NACOS_CONFIG_PREFIX + "-" + profile + "." + NACOS_CONFIG_FORMAT;
+	}
+
+	/**
 	 * 构建服务对应的 dataId
 	 *
 	 * @param appName 服务名
