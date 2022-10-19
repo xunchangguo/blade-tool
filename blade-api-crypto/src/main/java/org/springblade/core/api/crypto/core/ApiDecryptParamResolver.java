@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springblade.core.api.crypto.annotation.decrypt.ApiDecrypt;
 import org.springblade.core.api.crypto.bean.CryptoInfoBean;
 import org.springblade.core.api.crypto.config.ApiCryptoProperties;
+import org.springblade.core.api.crypto.constant.ApiCryptoConstant;
 import org.springblade.core.api.crypto.util.ApiCryptoUtil;
 import org.springblade.core.tool.jackson.JsonUtil;
 import org.springblade.core.tool.utils.Charsets;
@@ -59,7 +60,13 @@ public class ApiDecryptParamResolver implements HandlerMethodArgumentResolver {
 		if (StringUtil.isBlank(text)) {
 			return null;
 		}
-		CryptoInfoBean infoBean = new CryptoInfoBean(apiDecrypt.value(), apiDecrypt.secretKey());
+		String key = webRequest.getHeader(ApiCryptoConstant.AES_HEADER_KEY);
+		CryptoInfoBean infoBean;
+		if(StringUtil.hasLength(key)) {
+			infoBean = new CryptoInfoBean(apiDecrypt.value(), key);
+		} else {
+			infoBean = new CryptoInfoBean(apiDecrypt.value(), apiDecrypt.secretKey());
+		}
 		byte[] textBytes = text.getBytes(Charsets.UTF_8);
 		byte[] decryptData = ApiCryptoUtil.decryptData(properties, textBytes, infoBean);
 		return JsonUtil.parse(decryptData, parameter.getType());

@@ -6,9 +6,11 @@ import org.springblade.core.api.crypto.annotation.decrypt.ApiDecrypt;
 import org.springblade.core.api.crypto.bean.CryptoInfoBean;
 import org.springblade.core.api.crypto.bean.DecryptHttpInputMessage;
 import org.springblade.core.api.crypto.config.ApiCryptoProperties;
+import org.springblade.core.api.crypto.constant.ApiCryptoConstant;
 import org.springblade.core.api.crypto.exception.DecryptBodyFailException;
 import org.springblade.core.api.crypto.util.ApiCryptoUtil;
 import org.springblade.core.tool.utils.ClassUtil;
+import org.springblade.core.tool.utils.StringUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
@@ -24,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * 请求数据的加密信息解密处理<br>
@@ -66,6 +69,12 @@ public class ApiDecryptRequestBodyAdvice implements RequestBodyAdvice {
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getDecryptInfo(parameter);
 		if (cryptoInfoBean != null) {
 			// base64 byte array
+			List<String> keys = inputMessage.getHeaders().get(ApiCryptoConstant.AES_HEADER_KEY);
+			if(keys != null && !keys.isEmpty()) {
+				if(StringUtil.hasLength(keys.get(0))) {
+					cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), keys.get(0));
+				}
+			}
 			byte[] bodyByteArray = StreamUtils.copyToByteArray(messageBody);
 			decryptedBody = ApiCryptoUtil.decryptData(properties, bodyByteArray, cryptoInfoBean);
 		}

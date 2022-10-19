@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springblade.core.api.crypto.annotation.encrypt.ApiEncrypt;
 import org.springblade.core.api.crypto.bean.CryptoInfoBean;
 import org.springblade.core.api.crypto.config.ApiCryptoProperties;
+import org.springblade.core.api.crypto.constant.ApiCryptoConstant;
 import org.springblade.core.api.crypto.exception.EncryptBodyFailException;
 import org.springblade.core.api.crypto.util.ApiCryptoUtil;
 import org.springblade.core.tool.jackson.JsonUtil;
 import org.springblade.core.tool.utils.ClassUtil;
+import org.springblade.core.tool.utils.StringUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
@@ -20,6 +22,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.util.List;
 
 
 /**
@@ -55,6 +59,13 @@ public class ApiEncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 		response.getHeaders().setContentType(MediaType.TEXT_PLAIN);
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getEncryptInfo(returnType);
 		if (cryptoInfoBean != null) {
+			List<String> keys = request.getHeaders().get(ApiCryptoConstant.AES_HEADER_KEY);
+			if(keys != null && !keys.isEmpty()) {
+				if(StringUtil.hasLength(keys.get(0))) {
+					cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), keys.get(0));
+				}
+				response.getHeaders().remove(ApiCryptoConstant.AES_HEADER_KEY);
+			}
 			byte[] bodyJsonBytes = JsonUtil.toJsonAsBytes(body);
 			return ApiCryptoUtil.encryptData(properties, bodyJsonBytes, cryptoInfoBean);
 		}
