@@ -20,6 +20,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
 import java.io.ByteArrayInputStream;
@@ -69,11 +71,9 @@ public class ApiDecryptRequestBodyAdvice implements RequestBodyAdvice {
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getDecryptInfo(parameter);
 		if (cryptoInfoBean != null) {
 			// base64 byte array
-			List<String> keys = inputMessage.getHeaders().get(ApiCryptoConstant.AES_HEADER_KEY);
-			if(keys != null && !keys.isEmpty()) {
-				if(StringUtil.hasLength(keys.get(0))) {
-					cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), keys.get(0));
-				}
+			Object key = RequestContextHolder.currentRequestAttributes().getAttribute(ApiCryptoConstant.AES_HEADER_KEY, RequestAttributes.SCOPE_REQUEST);
+			if(key != null && StringUtil.hasLength(key.toString())) {
+				cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), key.toString());
 			}
 			byte[] bodyByteArray = StreamUtils.copyToByteArray(messageBody);
 			decryptedBody = ApiCryptoUtil.decryptData(properties, bodyByteArray, cryptoInfoBean);

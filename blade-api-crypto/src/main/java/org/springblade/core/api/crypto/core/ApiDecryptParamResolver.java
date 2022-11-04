@@ -31,6 +31,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
@@ -60,10 +61,10 @@ public class ApiDecryptParamResolver implements HandlerMethodArgumentResolver {
 		if (StringUtil.isBlank(text)) {
 			return null;
 		}
-		String key = webRequest.getHeader(ApiCryptoConstant.AES_HEADER_KEY);
+		Object key = webRequest.getAttribute(ApiCryptoConstant.AES_HEADER_KEY, RequestAttributes.SCOPE_REQUEST);
 		CryptoInfoBean infoBean;
-		if(StringUtil.hasLength(key)) {
-			infoBean = new CryptoInfoBean(apiDecrypt.value(), key);
+		if(key != null && StringUtil.hasLength(key.toString())) {
+			infoBean = new CryptoInfoBean(apiDecrypt.value(), key.toString());
 		} else {
 			infoBean = new CryptoInfoBean(apiDecrypt.value(), apiDecrypt.secretKey());
 		}

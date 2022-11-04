@@ -21,6 +21,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.List;
@@ -59,12 +61,9 @@ public class ApiEncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 		response.getHeaders().setContentType(MediaType.TEXT_PLAIN);
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getEncryptInfo(returnType);
 		if (cryptoInfoBean != null) {
-			List<String> keys = request.getHeaders().get(ApiCryptoConstant.AES_HEADER_KEY);
-			if(keys != null && !keys.isEmpty()) {
-				if(StringUtil.hasLength(keys.get(0))) {
-					cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), keys.get(0));
-				}
-				response.getHeaders().remove(ApiCryptoConstant.AES_HEADER_KEY);
+			Object key = RequestContextHolder.currentRequestAttributes().getAttribute(ApiCryptoConstant.AES_HEADER_KEY, RequestAttributes.SCOPE_REQUEST);
+			if(key != null && StringUtil.hasLength(key.toString())) {
+				cryptoInfoBean = new CryptoInfoBean(cryptoInfoBean.getType(), key.toString());
 			}
 			byte[] bodyJsonBytes = JsonUtil.toJsonAsBytes(body);
 			return ApiCryptoUtil.encryptData(properties, bodyJsonBytes, cryptoInfoBean);
