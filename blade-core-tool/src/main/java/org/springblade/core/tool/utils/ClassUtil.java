@@ -28,7 +28,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
- * 类工具类
+ * 类操作工具
  *
  * @author L.cm
  */
@@ -106,6 +106,7 @@ public class ClassUtil extends org.springframework.util.ClassUtils {
 		return AnnotatedElementUtils.findMergedAnnotation(beanType, annotationType);
 	}
 
+
 	/**
 	 * 判断是否有注解 Annotation
 	 *
@@ -124,4 +125,5 @@ public class ClassUtil extends org.springframework.util.ClassUtils {
 		Class<?> targetClass = method.getDeclaringClass();
 		return AnnotatedElementUtils.isAnnotated(targetClass, annotationType);
 	}
+
 }
