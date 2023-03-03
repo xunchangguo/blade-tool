@@ -25,6 +25,7 @@ import org.springblade.core.api.crypto.constant.ApiCryptoConstant;
 import org.springblade.core.api.crypto.util.ApiCryptoUtil;
 import org.springblade.core.tool.jackson.JsonUtil;
 import org.springblade.core.tool.utils.Charsets;
+import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -36,6 +37,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.lang.reflect.Parameter;
+import java.util.List;
 
 /**
  * param 参数 解析
@@ -60,6 +62,15 @@ public class ApiDecryptParamResolver implements HandlerMethodArgumentResolver {
 		String text = webRequest.getParameter(properties.getParamName());
 		if (StringUtil.isBlank(text)) {
 			return null;
+		}
+		List<String> whiteList = properties.getWhiteList();
+		if(whiteList != null && !whiteList.isEmpty()) {
+			String accessKey = webRequest.getHeader("X-ACCESS-KEY");
+			if (accessKey != null && accessKey.length() > 0) {
+				if(whiteList.contains(accessKey)) {
+					return null;
+				}
+			}
 		}
 		Object key = webRequest.getAttribute(ApiCryptoConstant.AES_HEADER_KEY, RequestAttributes.SCOPE_REQUEST);
 		CryptoInfoBean infoBean;

@@ -58,6 +58,16 @@ public class ApiEncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 		if (body == null) {
 			return null;
 		}
+		List<String> whiteList = properties.getWhiteList();
+		if(whiteList != null && !whiteList.isEmpty()) {
+			List<String> user = request.getHeaders().get("X-ACCESS-KEY");
+			if (user != null && !user.isEmpty()) {
+				String userCode = user.get(0);
+				if(whiteList.contains(userCode)) {
+					return body;
+				}
+			}
+		}
 		response.getHeaders().setContentType(MediaType.TEXT_PLAIN);
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getEncryptInfo(returnType);
 		if (cryptoInfoBean != null) {

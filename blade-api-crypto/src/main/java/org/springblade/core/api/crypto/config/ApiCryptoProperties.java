@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.List;
+
 /**
  * api 签名配置类
  *
@@ -42,5 +44,10 @@ public class ApiCryptoProperties {
 	 * rsa 私钥
 	 */
 	private String rsaPrivateKey;
+
+	/**
+	 * 白名单
+	 */
+	private List<String> whiteList;
 
 }

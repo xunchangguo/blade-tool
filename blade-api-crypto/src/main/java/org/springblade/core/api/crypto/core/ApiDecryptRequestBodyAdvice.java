@@ -10,6 +10,7 @@ import org.springblade.core.api.crypto.constant.ApiCryptoConstant;
 import org.springblade.core.api.crypto.exception.DecryptBodyFailException;
 import org.springblade.core.api.crypto.util.ApiCryptoUtil;
 import org.springblade.core.tool.utils.ClassUtil;
+import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -66,6 +67,16 @@ public class ApiDecryptRequestBodyAdvice implements RequestBodyAdvice {
 		InputStream messageBody = inputMessage.getBody();
 		if (messageBody.available() <= 0) {
 			return inputMessage;
+		}
+		List<String> whiteList = properties.getWhiteList();
+		if(whiteList != null && !whiteList.isEmpty()) {
+			List<String> user = inputMessage.getHeaders().get("X-ACCESS-KEY");
+			if (user != null && !user.isEmpty()) {
+				String userCode = user.get(0);
+				if(whiteList.contains(userCode)) {
+					return inputMessage;
+				}
+			}
 		}
 		byte[] decryptedBody = null;
 		CryptoInfoBean cryptoInfoBean = ApiCryptoUtil.getDecryptInfo(parameter);
